@@ -73,7 +73,7 @@ def upsample(x):
     return K.resize_images(x,2,2,"channels_last",interpolation='bilinear')
 
 def upsample_to_size(x):
-    y = im_size / x.shape[2]
+    y = im_size / int(x.shape[2])
     x = K.resize_images(x, y, y, "channels_last",interpolation='bilinear')
     return x
 
@@ -87,7 +87,7 @@ def g_block(inp, istyle, inoise, fil, u = True):
     else:
         out = Activation('linear')(inp)
 
-    rgb_style = Dense(fil, kernel_initializer = VarianceScaling(200//out.shape[2]))(istyle)
+    rgb_style = Dense(fil, kernel_initializer = VarianceScaling(200/int(out.shape[2])))(istyle)
     style = Dense(inp.shape[-1], kernel_initializer = 'he_uniform')(istyle)
     delta = Lambda(crop_to_fit)([inoise, out])
     d = Dense(fil, kernel_initializer = 'zeros')(delta)
@@ -122,7 +122,7 @@ def d_block(inp, fil, p = True):
     return out
 
 def to_rgb(inp, style):
-    size = inp.shape[2]
+    size = int(inp.shape[2])
     x = Conv2DMod(3, 1, kernel_initializer = VarianceScaling(200/size), demod = False)([inp, style])
     return Lambda(upsample_to_size, output_shape=[None, im_size, im_size, None])(x)
 
