@@ -73,7 +73,7 @@ def upsample(x):
     return K.resize_images(x,2,2,"channels_last",interpolation='bilinear')
 
 def upsample_to_size(x):
-    y = im_size / int(x.shape[2])
+    y = im_size // 2
     x = K.resize_images(x, y, y, "channels_last",interpolation='bilinear')
     return x
 
@@ -86,8 +86,7 @@ def g_block(inp, istyle, inoise, fil, u = True):
         out = Lambda(upsample, output_shape=[None, inp.shape[2] * 2, inp.shape[2] * 2, None])(inp)
     else:
         out = Activation('linear')(inp)
-
-    rgb_style = Dense(fil, kernel_initializer = VarianceScaling(200/int(out.shape[2])))(istyle)
+t(out.shape[2])))(istyle)
     style = Dense(inp.shape[-1], kernel_initializer = 'he_uniform')(istyle)
     delta = Lambda(crop_to_fit)([inoise, out])
     d = Dense(fil, kernel_initializer = 'zeros')(delta)
@@ -348,7 +347,7 @@ class StyleGAN(object):
         self.GAN.G.summary()
 
         #Data generator (my own code, not from TF 2.0)
-        self.im = dataGenerator(directory, im_size, flip = True)
+        # self.im = dataGenerator(directory, im_size, flip = True)
 
         #Set up variables
         self.lastblip = time.clock()
@@ -633,15 +632,13 @@ if __name__ == "__main__":
     model = StyleGAN(lr = 0.0001, silent = False)
     model.evaluate(0)
 
-    while model.GAN.steps < 1000001:
-        model.train()
+    # while model.GAN.steps < 1000001:
+        # model.train()
 
-    """
-    model.load(31)
+    model.load(28)
 
     n1 = noiseList(64)
     n2 = nImage(64)
     for i in range(50):
         print(i, end = '\r')
         model.generateTruncated(n1, noi = n2, trunc = i / 50, outImage = True, num = i)
-    """
