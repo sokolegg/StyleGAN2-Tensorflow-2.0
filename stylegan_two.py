@@ -87,7 +87,7 @@ def g_block(inp, istyle, inoise, fil, u = True):
     else:
         out = Activation('linear')(inp)
 
-    rgb_style = Dense(fil, kernel_initializer = VarianceScaling(200/out.shape[2]))(istyle)
+    rgb_style = Dense(fil, kernel_initializer = VarianceScaling(200./out.shape[2]))(istyle)
     style = Dense(inp.shape[-1], kernel_initializer = 'he_uniform')(istyle)
     delta = Lambda(crop_to_fit)([inoise, out])
     d = Dense(fil, kernel_initializer = 'zeros')(delta)
